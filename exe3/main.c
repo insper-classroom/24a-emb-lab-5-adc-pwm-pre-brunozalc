@@ -1,7 +1,7 @@
 #include <FreeRTOS.h>
-#include <task.h>
-#include <semphr.h>
 #include <queue.h>
+#include <semphr.h>
+#include <task.h>
 
 #include "pico/stdlib.h"
 #include <stdio.h>
@@ -25,13 +25,22 @@ void data_task(void *p) {
 
 void process_task(void *p) {
     int data = 0;
+    int filter_data[5];
+    int filter_index = 0;
+    int sum = 0;
+    int average = 0;
 
     while (true) {
         if (xQueueReceive(xQueueData, &data, 100)) {
             // implementar filtro aqui!
 
+            sum -= filter_data[filter_index];
+            filter_data[filter_index] = data;
+            sum += data;
+            average = sum / 5;
+            filter_index = (filter_index + 1) % 5;
 
-
+            printf("Average: %d\n", average);
 
             // deixar esse delay!
             vTaskDelay(pdMS_TO_TICKS(50));
